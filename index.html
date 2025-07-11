@@ -6,28 +6,71 @@
   <title>Handwritten OCR</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f4f8;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
       text-align: center;
     }
+
+    h2 {
+      margin-bottom: 10px;
+      font-size: 22px;
+      color: #222;
+    }
+
+    p {
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    input[type="file"] {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #fff;
+      cursor: pointer;
+    }
+
+    img {
+      max-width: 100%;
+      margin-top: 20px;
+      border: 2px dashed #ccc;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
     #output {
       margin-top: 20px;
-      font-size: 20px;
-      color: green;
-    }
-    img {
-      max-width: 300px;
-      margin-top: 10px;
+      font-size: 18px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      background-color: #d4f7dc;
+      color: #2b7a2b;
+      display: none;
     }
   </style>
 </head>
 <body>
-  <h2>📝 Handwritten Text Recognition</h2>
-  <p>Upload a cropped handwritten word image:</p>
-  <input type="file" id="fileInput" accept="image/*" />
-  <br/>
-  <img id="preview" />
-  <div id="output"></div>
+  <div class="container">
+    <h2>📝 Handwritten Text Recognition</h2>
+    <p>Upload a cropped handwritten word image:</p>
+    <input type="file" id="fileInput" accept="image/*" />
+    <img id="preview" />
+    <div id="output"></div>
+  </div>
 
   <script>
     const fileInput = document.getElementById('fileInput');
@@ -38,14 +81,12 @@
       const file = fileInput.files[0];
       if (!file) return;
 
-      // Preview
       preview.src = URL.createObjectURL(file);
+      output.style.display = "block";
+      output.textContent = "Predicting...";
 
-      // Upload to Flask API
       const formData = new FormData();
       formData.append('image', file);
-
-      output.textContent = "Predicting...";
 
       try {
         const response = await fetch('http://127.0.0.1:5000/predict', {
@@ -58,9 +99,13 @@
           output.textContent = `Prediction: ${data.prediction}`;
         } else {
           output.textContent = `Error: ${data.error}`;
+          output.style.backgroundColor = "#ffe0e0";
+          output.style.color = "#cc0000";
         }
       } catch (error) {
         output.textContent = `Request failed: ${error}`;
+        output.style.backgroundColor = "#ffe0e0";
+        output.style.color = "#cc0000";
       }
     });
   </script>
