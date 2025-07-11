@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Handwritten OCR</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      text-align: center;
+    }
+    #output {
+      margin-top: 20px;
+      font-size: 20px;
+      color: green;
+    }
+    img {
+      max-width: 300px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>📝 Handwritten Text Recognition</h2>
+  <p>Upload a cropped handwritten word image:</p>
+  <input type="file" id="fileInput" accept="image/*" />
+  <br/>
+  <img id="preview" />
+  <div id="output"></div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const preview = document.getElementById('preview');
+    const output = document.getElementById('output');
+
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      // Preview
+      preview.src = URL.createObjectURL(file);
+
+      // Upload to Flask API
+      const formData = new FormData();
+      formData.append('image', file);
+
+      output.textContent = "Predicting...";
+
+      try {
+        const response = await fetch('http://127.0.0.1:5000/predict', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          output.textContent = `Prediction: ${data.prediction}`;
+        } else {
+          output.textContent = `Error: ${data.error}`;
+        }
+      } catch (error) {
+        output.textContent = `Request failed: ${error}`;
+      }
+    });
+  </script>
+</body>
+</html>
